@@ -1,13 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Zap, TrendingUp, Users, Star, ArrowRight } from "lucide-react";
+import { Brain, Zap, TrendingUp, Users, Star, ArrowRight, History, User, LogOut } from "lucide-react";
 import { IQTestComponent } from "@/components/IQTestComponent";
 import { AuthComponent } from "@/components/AuthComponent";
+import { TestHistoryComponent } from "@/components/TestHistoryComponent";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<"home" | "test" | "auth">("home");
+  const [currentView, setCurrentView] = useState<"home" | "test" | "auth" | "history">("home");
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check for existing session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    getSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Signed out successfully");
+      setCurrentView("home");
+    } catch (error: any) {
+      toast.error("Error signing out: " + error.message);
+    }
+  };
 
   if (currentView === "test") {
     return <IQTestComponent onBack={() => setCurrentView("home")} user={user} />;
@@ -15,6 +47,10 @@ const Index = () => {
 
   if (currentView === "auth") {
     return <AuthComponent onBack={() => setCurrentView("home")} onLogin={setUser} />;
+  }
+
+  if (currentView === "history") {
+    return <TestHistoryComponent onBack={() => setCurrentView("home")} user={user} />;
   }
 
   return (
@@ -30,7 +66,26 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-4">
             {user ? (
-              <span className="text-sm text-muted-foreground">Welcome back!</span>
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setCurrentView("history")} 
+                  className="gap-2"
+                >
+                  <History className="h-4 w-4" />
+                  History
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </>
             ) : (
               <Button variant="outline" onClick={() => setCurrentView("auth")}>
                 Sign In

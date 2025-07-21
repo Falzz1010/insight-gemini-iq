@@ -29,10 +29,17 @@ export const TestResults = ({ score, answers, questions, onBack, onRetake }: Tes
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "detailed" | "ai">("overview");
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    checkAuth();
     generateAIAnalysis();
   }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setUser(session?.user || null);
+  };
 
   const generateAIAnalysis = async () => {
     try {

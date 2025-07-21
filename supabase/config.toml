@@ -1,1 +1,4 @@
 project_id = "mnpxilgzzylodkneycpr"
+
+[functions.analyze-iq-results]
+verify_jwt = false
