@@ -81,10 +81,19 @@ serve(async (req) => {
     const geminiData = await geminiResponse.json()
     console.log('Gemini response received')
 
-    const analysis = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
+    let analysis = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
     if (!analysis) {
       throw new Error('No analysis content received from Gemini')
     }
+
+    // Clean up markdown formatting and special characters
+    analysis = analysis
+      .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove bold markdown
+      .replace(/\*([^*]+)\*/g, '$1')     // Remove italic markdown
+      .replace(/#+ /g, '')              // Remove markdown headers
+      .replace(/\*#\*#/g, '')           // Remove specific problematic characters
+      .replace(/[*#]+/g, '')            // Remove any remaining asterisks and hashes
+      .trim()
 
     // Get user from authorization header
     const authHeader = req.headers.get('authorization')

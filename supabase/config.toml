@@ -2,3 +2,6 @@ project_id = "mnpxilgzzylodkneycpr"
 
 [functions.analyze-iq-results]
 verify_jwt = false
+
+[functions.generate-iq-questions]
+verify_jwt = false

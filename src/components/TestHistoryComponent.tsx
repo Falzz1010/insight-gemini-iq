@@ -27,10 +27,35 @@ export const TestHistoryComponent = ({ onBack, user }: TestHistoryComponentProps
   useEffect(() => {
     if (user) {
       fetchTestHistory();
+      setupRealtimeSubscription();
     } else {
       setLoading(false);
     }
   }, [user]);
+
+  const setupRealtimeSubscription = () => {
+    const channel = supabase
+      .channel('test-history-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'iq_test_results',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Real-time update:', payload);
+          // Refresh history when changes occur
+          fetchTestHistory();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
 
   const fetchTestHistory = async () => {
     try {
