@@ -105,35 +105,36 @@ export const AuthComponent = ({ onBack, onLogin }: AuthComponentProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/20 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/20 p-2 sm:p-4">
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Header - Mobile Optimized */}
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
           <Button variant="ghost" onClick={onBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
           </Button>
         </div>
 
-        {/* Auth Card */}
+        {/* Auth Card - Mobile Optimized */}
         <Card className="border-0 shadow-xl">
-          <CardHeader className="text-center">
+          <CardHeader className="text-center p-4 sm:p-6">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-brain-primary to-brain-secondary flex items-center justify-center">
-                <Brain className="h-8 w-8 text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-brain-primary to-brain-secondary flex items-center justify-center">
+                <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-xl sm:text-2xl">
               {isLogin ? "Welcome Back" : "Create Account"}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               {isLogin 
                 ? "Sign in to continue your IQ journey" 
                 : "Join thousands of users discovering their potential"
               }
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
